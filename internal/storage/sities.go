@@ -43,3 +43,11 @@ func (cs *Cities) Add(city *models.City) error {
 	(*cs)[city.ID] = city
 	return nil
 }
+
+func (cs *Cities) Drop(id uint16) *models.City {
+	if targetCity, ok := (*cs)[id]; ok {
+		delete(*cs, id)
+		return targetCity
+	}
+	return nil
+}
