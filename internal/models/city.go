@@ -15,7 +15,16 @@ type City struct {
 }
 
 func (c *City) String() string {
-	return fmt.Sprintf("%T%+v\n", *c, *c)
+	return fmt.Sprintf("%v\n", *c)
+}
+
+func (c *City) Create(id, foundation uint16, population uint32, name, region, district string) {
+	c.ID = id
+	c.name = name
+	c.region = region
+	c.district = district
+	c.foundation = foundation
+	c.population = population
 }
 
 func (c *City) CreateFromRAW(rawInfo []string) error {
@@ -38,11 +47,6 @@ func (c *City) CreateFromRAW(rawInfo []string) error {
 	return nil
 }
 
-func (c *City) Create(id, foundation uint16, population uint32, name, region, district string) {
-	c.ID = id
-	c.name = name
-	c.region = region
-	c.district = district
-	c.foundation = foundation
-	c.population = population
+func (c *City) PopulateUpdate(newPopulation uint32) {
+	c.population = newPopulation
 }
