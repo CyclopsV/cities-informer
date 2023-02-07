@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"github.com/CyclopsV/cities-informer-skillbox/internal/models"
 	"log"
 )
@@ -19,7 +20,7 @@ func (cs *Cities) String() string {
 func (cs *Cities) Create(rawInfo [][]string) {
 	for _, raw := range rawInfo {
 		city := models.City{}
-		if err := city.Create(raw); err != nil {
+		if err := city.CreateFromRAW(raw); err != nil {
 			log.Printf("Ошибка распознания информации о городе: %#v\n\terr: %v\n", raw, err)
 			continue
 		}
@@ -33,4 +34,12 @@ func (cs *Cities) GetCityById(id uint16) *models.City {
 		return nil
 	}
 	return targetCity
+}
+
+func (cs *Cities) Add(city *models.City) error {
+	if checkCity, ok := (*cs)[city.ID]; ok {
+		return fmt.Errorf("Город с таким ID уже есть: %v\n", checkCity)
+	}
+	(*cs)[city.ID] = city
+	return nil
 }

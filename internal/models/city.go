@@ -6,7 +6,7 @@ import (
 )
 
 type City struct {
-	id         uint16
+	ID         uint16
 	name       string
 	region     string
 	district   string
@@ -15,30 +15,34 @@ type City struct {
 }
 
 func (c *City) String() string {
-	return fmt.Sprintf("%#v\n", c)
+	return fmt.Sprintf("%T%+v\n", *c, *c)
 }
 
-func (c *City) Create(rawInfo []string) error {
-	buf, err := strconv.ParseUint(rawInfo[0], 10, 16)
+func (c *City) CreateFromRAW(rawInfo []string) error {
+	id, err := strconv.ParseUint(rawInfo[0], 10, 16)
 	if err != nil {
 		return err
 	}
-	c.id = uint16(buf)
-
-	buf, err = strconv.ParseUint(rawInfo[4], 10, 32)
+	population, err := strconv.ParseUint(rawInfo[4], 10, 64)
 	if err != nil {
 		return err
 	}
-	c.population = uint32(buf)
-
-	buf, err = strconv.ParseUint(rawInfo[4], 10, 16)
+	foundation, err := strconv.ParseUint(rawInfo[4], 10, 64)
 	if err != nil {
 		return err
 	}
-	c.foundation = uint16(buf)
-
-	c.name = rawInfo[1]
-	c.region = rawInfo[2]
-	c.district = rawInfo[3]
+	name := rawInfo[1]
+	region := rawInfo[2]
+	district := rawInfo[3]
+	c.Create(uint16(id), uint16(foundation), uint32(population), name, region, district)
 	return nil
+}
+
+func (c *City) Create(id, foundation uint16, population uint32, name, region, district string) {
+	c.ID = id
+	c.name = name
+	c.region = region
+	c.district = district
+	c.foundation = foundation
+	c.population = population
 }
