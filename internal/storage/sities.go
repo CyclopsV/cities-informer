@@ -26,3 +26,11 @@ func (cs *Cities) Create(rawInfo [][]string) {
 		(*cs)[city.ID] = &city
 	}
 }
+
+func (cs *Cities) GetCityById(id uint16) *models.City {
+	targetCity, ok := (*cs)[id]
+	if !ok {
+		return nil
+	}
+	return targetCity
+}
