@@ -50,3 +50,19 @@ func (c *City) CreateFromRAW(rawInfo []string) error {
 func (c *City) PopulateUpdate(newPopulation uint32) {
 	c.population = newPopulation
 }
+
+func (c *City) GetRegion() string {
+	return c.region
+}
+
+func (c *City) GetDistrict() string {
+	return c.district
+}
+
+func (c *City) GetFoundation() uint16 {
+	return c.foundation
+}
+
+func (c *City) GetPopulation() uint32 {
+	return c.population
+}
