@@ -66,3 +66,15 @@ func (c *City) GetFoundation() uint16 {
 func (c *City) GetPopulation() uint32 {
 	return c.population
 }
+
+func (c *City) ToMap() map[string]interface{} {
+	cityMap := map[string]interface{}{
+		"id":         c.ID,
+		"name":       c.name,
+		"region":     c.region,
+		"district":   c.district,
+		"population": c.population,
+		"foundation": c.foundation,
+	}
+	return cityMap
+}
