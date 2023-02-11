@@ -21,7 +21,7 @@ func init() {
 func getCityByIdHandler(w http.ResponseWriter, r *http.Request) {
 	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
 	if err != nil {
-		statusBadRequest(&w, "Не распознано тело запроса:\n"+err.Error())
+		statusBadRequest(&w, err.Error())
 		return
 	}
 	fields := map[string]string{
@@ -48,7 +48,7 @@ func getCityByIdHandler(w http.ResponseWriter, r *http.Request) {
 func createCityHandler(w http.ResponseWriter, r *http.Request) {
 	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
 	if err != nil {
-		statusBadRequest(&w, "Не распознано тело запроса:\n"+err.Error())
+		statusBadRequest(&w, err.Error())
 		return
 	}
 	fields := map[string]string{
@@ -73,6 +73,27 @@ func createCityHandler(w http.ResponseWriter, r *http.Request) {
 	city.Create(id, foundation, population, name, region, district)
 	if check := cities.Add(&city); check != nil {
 		statusBadRequest(&w, fmt.Sprintf("город с id %v уже существует\n{%v}", city.ID, city))
+		return
+	}
+	statusOK(&w, []byte{})
+}
+
+func deleteCityHandler(w http.ResponseWriter, r *http.Request) {
+	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
+	if err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	fields := map[string]string{
+		"id": "uint16",
+	}
+	if err = pars.CheckFields(jsonBuf, fields); err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	city := cities.Drop(uint16(jsonBuf["id"].(float64)))
+	if city == nil {
+		statusBadRequest(&w, "Город не найден")
 		return
 	}
 	statusOK(&w, []byte{})
