@@ -127,7 +127,7 @@ func updateCityHandler(w http.ResponseWriter, r *http.Request) {
 	statusOK(&w, []byte{})
 }
 
-func gerRegionOrDistrictHandler(w http.ResponseWriter, r *http.Request) {
+func getRegionOrDistrictHandler(w http.ResponseWriter, r *http.Request) {
 	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
 	if err != nil {
 		statusBadRequest(&w, err.Error())
@@ -147,6 +147,44 @@ func gerRegionOrDistrictHandler(w http.ResponseWriter, r *http.Request) {
 		citiesList = cities.GetCitiesByRegionOrDistrict(target, true)
 	} else {
 		citiesList = cities.GetCitiesByRegionOrDistrict(target, false)
+	}
+	var citiesMapList []map[string]interface{}
+	for _, city := range citiesList {
+		citiesMapList = append(citiesMapList, city.ToMap())
+	}
+	citiesMap := map[string]interface{}{
+		"cities": citiesMapList,
+	}
+	citiesBytes, err := json.Marshal(citiesMap)
+	if err != nil {
+		statusInternalServerError(&w, "Не уодалось создать ответ:\n"+err.Error())
+		return
+	}
+	statusOK(&w, citiesBytes)
+}
+
+func getPopulationOrFoundationHandler(w http.ResponseWriter, r *http.Request) {
+	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
+	if err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	targetMode := chi.URLParam(r, "populationOrFoundation")
+	fields := map[string]string{
+		"from": "uint32",
+		"to":   "uint32",
+	}
+	if err = pars.CheckFields(jsonBuf, fields); err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	from := uint32(jsonBuf["from"].(float64))
+	to := uint32(jsonBuf["to"].(float64))
+	var citiesList []*models.City
+	if targetMode == "population" {
+		citiesList = cities.GetCitiesByPopulationOrFoundation(from, to, false)
+	} else {
+		citiesList = cities.GetCitiesByPopulationOrFoundation(from, to, true)
 	}
 	var citiesMapList []map[string]interface{}
 	for _, city := range citiesList {

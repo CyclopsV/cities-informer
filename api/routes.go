@@ -15,7 +15,8 @@ func CreateRoutes() *chi.Mux {
 		r.Put("/", createCityHandler)
 		r.Delete("/", deleteCityHandler)
 		r.Patch("/", updateCityHandler)
-		r.Get("/{regionOrDistrict:region|district}", gerRegionOrDistrictHandler)
+		r.Get("/{regionOrDistrict:region|district}", getRegionOrDistrictHandler)
+		r.Get("/{populationOrFoundation:population|foundation}", getPopulationOrFoundationHandler)
 	})
 
 	return r
