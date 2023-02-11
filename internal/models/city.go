@@ -36,7 +36,7 @@ func (c *City) CreateFromRAW(rawInfo []string) error {
 	if err != nil {
 		return err
 	}
-	foundation, err := strconv.ParseUint(rawInfo[4], 10, 64)
+	foundation, err := strconv.ParseUint(rawInfo[5], 10, 64)
 	if err != nil {
 		return err
 	}
