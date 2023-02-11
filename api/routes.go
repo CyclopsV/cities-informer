@@ -12,7 +12,7 @@ func CreateRoutes() *chi.Mux {
 
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", getCityByIdHandler)
-
+		r.Patch("/", createCityHandler)
 	})
 
 	return r
