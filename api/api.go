@@ -2,9 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/CyclopsV/cities-informer-skillbox/internal/models"
 	"github.com/CyclopsV/cities-informer-skillbox/internal/storage"
 	"github.com/CyclopsV/cities-informer-skillbox/pkg/pars"
-	"math"
 	"net/http"
 )
 
@@ -23,17 +24,14 @@ func getCityByIdHandler(w http.ResponseWriter, r *http.Request) {
 		statusBadRequest(&w, "Не распознано тело запроса:\n"+err.Error())
 		return
 	}
-	idInterface, ok := jsonBuf["id"]
-	if !ok {
-		statusBadRequest(&w, "Не найдено поле `id`")
+	fields := map[string]string{
+		"id": "uint16",
+	}
+	if err = pars.CheckFields(jsonBuf, fields); err != nil {
+		statusBadRequest(&w, err.Error())
 		return
 	}
-	id, ok := idInterface.(float64)
-	if !ok || id > math.MaxInt16 {
-		statusBadRequest(&w, "Неверный тип данных")
-		return
-	}
-	city := cities.GetCityById(uint16(id))
+	city := cities.GetCityById(uint16(jsonBuf["id"].(float64)))
 	if city == nil {
 		statusBadRequest(&w, "Город не найден")
 		return
@@ -45,4 +43,37 @@ func getCityByIdHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	statusOK(&w, cityBytes)
+}
+
+func createCityHandler(w http.ResponseWriter, r *http.Request) {
+	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
+	if err != nil {
+		statusBadRequest(&w, "Не распознано тело запроса:\n"+err.Error())
+		return
+	}
+	fields := map[string]string{
+		"id":         "uint16",
+		"name":       "string",
+		"region":     "string",
+		"district":   "string",
+		"foundation": "uint16",
+		"population": "uint32",
+	}
+	if err = pars.CheckFields(jsonBuf, fields); err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	id := uint16(jsonBuf["id"].(float64))
+	name := jsonBuf["name"].(string)
+	region := jsonBuf["region"].(string)
+	district := jsonBuf["district"].(string)
+	population := uint32(jsonBuf["population"].(float64))
+	foundation := uint16(jsonBuf["foundation"].(float64))
+	city := models.City{}
+	city.Create(id, foundation, population, name, region, district)
+	if check := cities.Add(&city); check != nil {
+		statusBadRequest(&w, fmt.Sprintf("город с id %v уже существует\n{%v}", city.ID, city))
+		return
+	}
+	statusOK(&w, []byte{})
 }
