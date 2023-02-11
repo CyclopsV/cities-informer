@@ -75,7 +75,7 @@ func createCityHandler(w http.ResponseWriter, r *http.Request) {
 		statusBadRequest(&w, fmt.Sprintf("город с id %v уже существует\n{%v}", city.ID, city))
 		return
 	}
-	statusOK(&w, []byte{})
+	statusCreated(&w, []byte{})
 }
 
 func deleteCityHandler(w http.ResponseWriter, r *http.Request) {
@@ -96,5 +96,32 @@ func deleteCityHandler(w http.ResponseWriter, r *http.Request) {
 		statusBadRequest(&w, "Город не найден")
 		return
 	}
+	statusOK(&w, []byte{})
+}
+
+func updateCityHandler(w http.ResponseWriter, r *http.Request) {
+	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
+	if err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	fields := map[string]string{
+		"id":         "uint16",
+		"population": "uint32",
+	}
+	if err = pars.CheckFields(jsonBuf, fields); err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+
+	id := uint16(jsonBuf["id"].(float64))
+	populationNew := uint32(jsonBuf["population"].(float64))
+	city := cities.GetCityById(id)
+	if city == nil {
+		statusBadRequest(&w, "Город не найден")
+		return
+	}
+	city.PopulateUpdate(populationNew)
+
 	statusOK(&w, []byte{})
 }
