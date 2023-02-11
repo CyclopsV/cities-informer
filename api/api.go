@@ -6,6 +6,7 @@ import (
 	"github.com/CyclopsV/cities-informer-skillbox/internal/models"
 	"github.com/CyclopsV/cities-informer-skillbox/internal/storage"
 	"github.com/CyclopsV/cities-informer-skillbox/pkg/pars"
+	"github.com/go-chi/chi"
 	"net/http"
 )
 
@@ -124,4 +125,40 @@ func updateCityHandler(w http.ResponseWriter, r *http.Request) {
 	city.PopulateUpdate(populationNew)
 
 	statusOK(&w, []byte{})
+}
+
+func gerRegionOrDistrictHandler(w http.ResponseWriter, r *http.Request) {
+	jsonBuf, err := pars.ParseResponseToJSON(r.Body)
+	if err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	targetMode := chi.URLParam(r, "regionOrDistrict")
+	fields := map[string]string{
+		targetMode: "string",
+	}
+	if err = pars.CheckFields(jsonBuf, fields); err != nil {
+		statusBadRequest(&w, err.Error())
+		return
+	}
+	target := jsonBuf[targetMode].(string)
+	var citiesList []*models.City
+	if targetMode == "district" {
+		citiesList = cities.GetCitiesByRegionOrDistrict(target, true)
+	} else {
+		citiesList = cities.GetCitiesByRegionOrDistrict(target, false)
+	}
+	var citiesMapList []map[string]interface{}
+	for _, city := range citiesList {
+		citiesMapList = append(citiesMapList, city.ToMap())
+	}
+	citiesMap := map[string]interface{}{
+		"cities": citiesMapList,
+	}
+	citiesBytes, err := json.Marshal(citiesMap)
+	if err != nil {
+		statusInternalServerError(&w, "Не уодалось создать ответ:\n"+err.Error())
+		return
+	}
+	statusOK(&w, citiesBytes)
 }
