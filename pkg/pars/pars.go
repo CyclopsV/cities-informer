@@ -38,6 +38,9 @@ func ParseResponseToJSON(body io.ReadCloser) (map[string]interface{}, error) {
 	if content, err := io.ReadAll(body); err == nil {
 		err = json.Unmarshal(content, &message)
 	}
+	if err != nil {
+		err = fmt.Errorf("тело запроса не распознано\n----\n%v", err)
+	}
 	return message, err
 }
 
