@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"fmt"
 	"github.com/CyclopsV/cities-informer-skillbox/internal/models"
 	"log"
 	"math"
@@ -37,9 +36,9 @@ func (cs *Cities) GetCityById(id uint16) *models.City {
 	return targetCity
 }
 
-func (cs *Cities) Add(city *models.City) error {
+func (cs *Cities) Add(city *models.City) *models.City {
 	if checkCity, ok := (*cs)[city.ID]; ok {
-		return fmt.Errorf("Город с таким ID уже есть: %v\n", checkCity)
+		return checkCity
 	}
 	(*cs)[city.ID] = city
 	return nil
