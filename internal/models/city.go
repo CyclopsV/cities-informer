@@ -78,3 +78,18 @@ func (c *City) ToMap() map[string]interface{} {
 	}
 	return cityMap
 }
+
+func (c *City) ToList() []string {
+	id := strconv.FormatUint(uint64(c.ID), 10)
+	population := strconv.FormatUint(uint64(c.population), 10)
+	foundation := strconv.FormatUint(uint64(c.foundation), 10)
+	cityLists := []string{
+		id,
+		c.name,
+		c.region,
+		c.district,
+		population,
+		foundation,
+	}
+	return cityLists
+}
