@@ -8,6 +8,13 @@ import (
 
 type Cities map[uint16]*models.City
 
+func (cs *Cities) Exit() {
+	if err := cs.Save(); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Данные сохранены")
+}
+
 func (cs *Cities) String() string {
 	sitiesInfoStr := "Иформация о городах:\n"
 	for _, city := range *cs {
