@@ -11,12 +11,12 @@ import (
 )
 
 var (
-	cities = storage.Cities{}
+	Cities = storage.Cities{}
 )
 
 func init() {
-	raw := pars.ParseCSV("sources/cities.csv")
-	cities.Create(raw)
+	raw := pars.ParseCSV("sources/Cities.csv")
+	Cities.Create(raw)
 }
 
 func getCityByIdHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +32,7 @@ func getCityByIdHandler(w http.ResponseWriter, r *http.Request) {
 		statusBadRequest(&w, err.Error())
 		return
 	}
-	city := cities.GetCityById(uint16(jsonBuf["id"].(float64)))
+	city := Cities.GetCityById(uint16(jsonBuf["id"].(float64)))
 	if city == nil {
 		statusBadRequest(&w, "Город не найден")
 		return
@@ -72,7 +72,7 @@ func createCityHandler(w http.ResponseWriter, r *http.Request) {
 	foundation := uint16(jsonBuf["foundation"].(float64))
 	city := models.City{}
 	city.Create(id, foundation, population, name, region, district)
-	if check := cities.Add(&city); check != nil {
+	if check := Cities.Add(&city); check != nil {
 		statusBadRequest(&w, fmt.Sprintf("город с id %v уже существует\n{%v}", city.ID, city))
 		return
 	}
@@ -92,7 +92,7 @@ func deleteCityHandler(w http.ResponseWriter, r *http.Request) {
 		statusBadRequest(&w, err.Error())
 		return
 	}
-	city := cities.Drop(uint16(jsonBuf["id"].(float64)))
+	city := Cities.Drop(uint16(jsonBuf["id"].(float64)))
 	if city == nil {
 		statusBadRequest(&w, "Город не найден")
 		return
@@ -117,7 +117,7 @@ func updateCityHandler(w http.ResponseWriter, r *http.Request) {
 
 	id := uint16(jsonBuf["id"].(float64))
 	populationNew := uint32(jsonBuf["population"].(float64))
-	city := cities.GetCityById(id)
+	city := Cities.GetCityById(id)
 	if city == nil {
 		statusBadRequest(&w, "Город не найден")
 		return
@@ -144,16 +144,16 @@ func getRegionOrDistrictHandler(w http.ResponseWriter, r *http.Request) {
 	target := jsonBuf[targetMode].(string)
 	var citiesList []*models.City
 	if targetMode == "district" {
-		citiesList = cities.GetCitiesByRegionOrDistrict(target, true)
+		citiesList = Cities.GetCitiesByRegionOrDistrict(target, true)
 	} else {
-		citiesList = cities.GetCitiesByRegionOrDistrict(target, false)
+		citiesList = Cities.GetCitiesByRegionOrDistrict(target, false)
 	}
 	var citiesMapList []map[string]interface{}
 	for _, city := range citiesList {
 		citiesMapList = append(citiesMapList, city.ToMap())
 	}
 	citiesMap := map[string]interface{}{
-		"cities": citiesMapList,
+		"Cities": citiesMapList,
 	}
 	citiesBytes, err := json.Marshal(citiesMap)
 	if err != nil {
@@ -182,16 +182,16 @@ func getPopulationOrFoundationHandler(w http.ResponseWriter, r *http.Request) {
 	to := uint32(jsonBuf["to"].(float64))
 	var citiesList []*models.City
 	if targetMode == "population" {
-		citiesList = cities.GetCitiesByPopulationOrFoundation(from, to, false)
+		citiesList = Cities.GetCitiesByPopulationOrFoundation(from, to, false)
 	} else {
-		citiesList = cities.GetCitiesByPopulationOrFoundation(from, to, true)
+		citiesList = Cities.GetCitiesByPopulationOrFoundation(from, to, true)
 	}
 	var citiesMapList []map[string]interface{}
 	for _, city := range citiesList {
 		citiesMapList = append(citiesMapList, city.ToMap())
 	}
 	citiesMap := map[string]interface{}{
-		"cities": citiesMapList,
+		"Cities": citiesMapList,
 	}
 	citiesBytes, err := json.Marshal(citiesMap)
 	if err != nil {
