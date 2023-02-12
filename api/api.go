@@ -153,7 +153,7 @@ func getRegionOrDistrictHandler(w http.ResponseWriter, r *http.Request) {
 		citiesMapList = append(citiesMapList, city.ToMap())
 	}
 	citiesMap := map[string]interface{}{
-		"Cities": citiesMapList,
+		"cities": citiesMapList,
 	}
 	citiesBytes, err := json.Marshal(citiesMap)
 	if err != nil {
@@ -191,7 +191,7 @@ func getPopulationOrFoundationHandler(w http.ResponseWriter, r *http.Request) {
 		citiesMapList = append(citiesMapList, city.ToMap())
 	}
 	citiesMap := map[string]interface{}{
-		"Cities": citiesMapList,
+		"cities": citiesMapList,
 	}
 	citiesBytes, err := json.Marshal(citiesMap)
 	if err != nil {
