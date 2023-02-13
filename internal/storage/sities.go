@@ -4,7 +4,10 @@ import (
 	"github.com/CyclopsV/cities-informer-skillbox/internal/models"
 	"log"
 	"math"
+	"sync"
 )
+
+var mutex *sync.Mutex
 
 type Cities map[uint16]*models.City
 
@@ -31,7 +34,9 @@ func (cs *Cities) Create(rawInfo [][]string) {
 			log.Printf("Ошибка распознания информации о городе: %#v\n\terr: %v\n", raw, err)
 			continue
 		}
+		mutex.Lock()
 		(*cs)[city.ID] = &city
+		mutex.Unlock()
 	}
 }
 
@@ -47,13 +52,17 @@ func (cs *Cities) Add(city *models.City) *models.City {
 	if checkCity, ok := (*cs)[city.ID]; ok {
 		return checkCity
 	}
+	mutex.Lock()
 	(*cs)[city.ID] = city
+	mutex.Unlock()
 	return nil
 }
 
 func (cs *Cities) Drop(id uint16) *models.City {
 	if targetCity, ok := (*cs)[id]; ok {
+		mutex.Lock()
 		delete(*cs, id)
+		mutex.Unlock()
 		return targetCity
 	}
 	return nil
