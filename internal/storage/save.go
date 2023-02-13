@@ -7,6 +7,7 @@ import (
 )
 
 func (cs *Cities) Save() error {
+	mutex.Lock()
 	var citiesList [][]string
 	for _, city := range *cs {
 		cityList := city.ToList()
